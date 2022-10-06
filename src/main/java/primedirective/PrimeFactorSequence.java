@@ -2,11 +2,11 @@ package primedirective;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PrimeFactorSequence {
     private List<Integer> primes;
     private int upperBound;
-
     /**
      * Create a PrimeFactorSequence object with a defined upperbound.
      *
@@ -27,8 +27,29 @@ public class PrimeFactorSequence {
      */
     public List<Integer> primeFactorSequence() {
         List<Integer> seq = new ArrayList<>();
-        // TODO: Implement this method
+        for(int i = 0; i < upperBound + 1; i++){
+            seq.add(primeFactorCount(i));
+        }
+
         return seq;
+    }
+
+    public int primeFactorCount(int n){
+        if(n == 0 || n == 1){
+            return 0;
+        }
+
+        if(primes.contains(n)){
+            return 1;
+        }
+
+        for(int i = 2; i < n; i++){
+            if(n % i == 0){
+                return 1 + primeFactorCount(n / i);
+            }
+        }
+
+        return 0;
     }
 
     /**
@@ -42,6 +63,11 @@ public class PrimeFactorSequence {
     public List<Integer> numbersWithMPrimeFactors(int m) {
         List<Integer> seq = new ArrayList<>();
         // TODO: Implement this method
+        for(int i = 0; i< upperBound + 1; i++){
+            if(primeFactorCount(i) == m){
+                seq.add(i);
+            }
+        }
         return seq;
     }
 
@@ -60,6 +86,14 @@ public class PrimeFactorSequence {
     public List<IntPair> numbersWithMPrimeFactorsAndSmallGap(int m, int gap) {
         List<IntPair> listOfPairs = new ArrayList<>();
         // TODO: Implement this method
+        List<Integer> listofMfactors = numbersWithMPrimeFactors(m);
+
+        for(int i = 0; i < listofMfactors.size() - 1; i++){
+            if(listofMfactors.get(i+1) - listofMfactors.get(i) <= gap){
+                listOfPairs.add(new IntPair(listofMfactors.get(i), listofMfactors.get(i+1)));
+            }
+        }
+
         return listOfPairs;
     }
 
@@ -77,7 +111,58 @@ public class PrimeFactorSequence {
      */
     public String changeToPrime(int n) {
         // TODO: Implement this method
-        return "-";
+        shortestLength = Integer.MAX_VALUE;
+        curr = "";
+        changeOperation("", n);
+
+        if(shortestLength == Integer.MAX_VALUE && curr.equals("")){
+            return "-";
+        }
+
+        return curr;
+    }
+
+    private int shortestLength;
+    private String curr;
+    public void changeOperation(String target, int n){
+
+        if(primes.contains(n)){
+            System.out.println(target);
+            System.out.println(curr.length());
+            if(target.length() > shortestLength){
+                return;
+            } else {
+                if(shortestLength == Integer.MAX_VALUE && curr.equals("")){
+                    curr = target;
+                    shortestLength = target.length();
+                    return;
+                } else if(shortestLength == target.length()){
+                    for(int i = 0; i < target.length(); i++){
+                        if(Integer.parseInt(String.valueOf(target.charAt(i)))< Integer.parseInt(String.valueOf(curr.charAt(i)))){
+                            curr = target;
+                            shortestLength = target.length();
+                            return;
+                        }
+                        return;
+                    }
+                } else {
+                    curr = target;
+                    shortestLength = target.length();
+                    return;
+                }
+            }
+            return;
+        } else if(n == upperBound || 2*n + 1 >= upperBound){
+            if(shortestLength == Integer.MAX_VALUE){
+                return;
+            }
+        } else {
+            if(target.length() > shortestLength){
+                return;
+            }
+            changeOperation(target + '0', 2*n + 1);
+            changeOperation(target + '1', n + 1);
+        }
     }
 
 }
